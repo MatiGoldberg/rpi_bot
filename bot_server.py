@@ -2,6 +2,7 @@
 import json
 import logger
 from bot_config import bot_config
+import http.client, urllib
 
 log = logger.get_logger()
 
@@ -12,6 +13,10 @@ class bot_server:
     def __init__(self, config_file='bot.config.json'):
         self._is_valid = False
         self._load_configuration(config_file)
+        if not self._is_valid:
+            return
+        self.connection = http.client.HTTPSConnection(self.base_uri)
+        self._build_in_test()
                 
     # -- public mehtods --
     def is_valid(self):
@@ -33,5 +38,42 @@ class bot_server:
         self.polling_period = config.polling_period
         log.info('configuration loaded successfuly')            
         self._is_valid=True
+        
+    def _build_in_test(self):
+        log.debug('starting build in test')
+        response = self._send_request('getMe')
+        if not self._response_is_valid(response):
+            log.error('invalid response, BIT failed.')
+            self._is_valid = False
+            return
 
+        bot_username = response['result']['username']
+        log.info(f'connection is valid to bot @{bot_username}')
+        
+    # -- communication methods -- 
+    def _send_request(self, method, params=None):
+        query = ''
+        if params is not None:
+            query = '?' + urllib.urlencode(params)
+        
+        self.connection.request('GET',self.path.format(method) + query)
+        res = self.connection.getresponse()
+        
+        data = res.read()
+        if res.status is not 200:
+            log.error(f'http error ({res.status})')
+            return None
+        try:
+            return json.loads(data)
+        except:
+            log.error('failed to parse response')
+            return None
+
+    def _response_is_valid(self, res):
+        return res is not None and 'ok' in res and res['ok'] is True and 'result' in res
+    
+    # -- static methods --
+    @staticmethod
+    def _print_response(response_object):
+        return json.dumps(response_object, indent=4, sort_keys=True)
 
