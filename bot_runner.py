@@ -2,7 +2,7 @@
 import argparse
 import logger
 from bot_server import bot_server
-from sys import platform
+from platform import platform
 
 VERSION = '1.0'
 LOG_FILENAME = 'bot_server.log'
@@ -18,7 +18,7 @@ parser.add_argument('-l','--log-level',help='log level', choices=['info', 'debug
 def main():    
     args = parser.parse_args()
     log = logger.set_logger(LOG_FILENAME, debug_mode=args.log_level, print_to_screen=args.verbose)
-    log.info(f'booting bot v{VERSION} on {platform}')
+    log.info(f'booting bot v{VERSION} on {platform()}')
     log.info('\n\t'.join(['arguments:', f'log-level: {args.log_level}', f'verbose: {args.verbose}', f'mode: {args.mode}',f'configuration filename: {args.config_file}']))
     bot = bot_server(config_file=args.config_file)
     if not bot.is_valid():
