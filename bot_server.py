@@ -1,22 +1,23 @@
 #!/bin/python3
-import argparse
+import json
 import logger
 
-VERSION = '1.0'
-LOG_FILENAME = 'bot_server.log'
+log = logger.get_logger()
 
-# -- argument parser settings -- #
-parser = argparse.ArgumentParser(description="arguments for bot server")
-parser.add_argument('-v','--verbose',help='print log to screen', action='store_true')
-parser.add_argument('-m','--mode',help='running mode', choices=['test', 'full'], default='test')
-
-# -- main class for a telegram-based dispatch -- #
-def main():    
-    args = parser.parse_args()
-    log = logger.set_logger(LOG_FILENAME,print_to_screen=True)
-    log.info(f'booting bot v{VERSION}')
-    log.info(f'verbose: {args.verbose}')
-    log.info(f'mode: {args.mode}')
-    log.info('shutting down.')
-
-main() 
+class bot_server:
+    
+    def __init__(self, config_file='bot.config.json'):
+        self._is_valid = False
+        self._load_configuration(config_file)
+        
+    # -- public mehtods --
+    def is_valid(self):
+        return self._is_valid
+    
+    def run(self, run_mode='full'):
+        log.info(f'bot starting in {run_mode} mode')
+        
+    # -- private methods --
+    def _load_configuration(self, config_file):
+        log.debug(f'loading configuration from [{config_file}]')
+        self._is_valid=True

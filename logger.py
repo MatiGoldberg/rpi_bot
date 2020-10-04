@@ -3,7 +3,7 @@ import logging
 logger_set = False
 
 def set_logger(log_filename, debug_mode=False, print_to_screen=False):
-    log_formatter = logging.Formatter('[%(asctime)s][%(threadName)s][%(filename)s][%(funcName)s][%(levelname)s] %(message)s')
+    log_formatter = logging.Formatter('[%(asctime)s][%(threadName)s][%(filename)s/%(funcName)s][%(levelname)s] %(message)s')
     log_formatter.default_msec_format = '%s.%03d'
     log = logging.getLogger()
     if debug_mode:
